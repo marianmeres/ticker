@@ -2,23 +2,26 @@
 
 Do something when it ticks.
 
-(Effectively just a `setInterval` with a friendlier and
-[store compatible](https://github.com/marianmeres/store) API.)
+Effectively just a `setInterval` with a friendlier and
+[store compatible](https://github.com/marianmeres/store) API.
 
 ## Install
 ```shell
 $ npm i @marianmeres/ticker
 ```
 
-## Example usage
+## Usage
 
 ```typescript
 // once started, will tick every 1000 milliseconds
 const t = createTicker(1_000);
 
-// control api
+// basic control api
 t.start();
 t.stop();
+
+// decrease/increase frequency on existing instance
+t.setInterval(ms);
 
 // subscribe api
 const unsub = t.subscribe((timestamp) => {
