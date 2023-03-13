@@ -2,6 +2,8 @@
 
 Do something when it ticks.
 
+(Effectively just a `setInterval` with a friendlier API.)
+
 ## Install
 ```shell
 $ npm i @marianmeres/ticker
