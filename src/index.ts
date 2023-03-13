@@ -16,15 +16,21 @@ export const createTicker = (interval = 1000) => {
 		_timerId = setTimeout(_tick, interval);
 	};
 
-	const start = () => !_timerId && _tick();
-
-	const stop = () => {
-		_store.set(0);
-		if (_timerId) {
-			clearTimeout(_timerId);
-			_timerId = 0;
+	const ticker = {
+		subscribe: _store.subscribe,
+		start: () => {
+			!_timerId && _tick();
+			return ticker;
+		},
+		stop: () => {
+			_store.set(0);
+			if (_timerId) {
+				clearTimeout(_timerId);
+				_timerId = 0;
+			}
+			return ticker;
 		}
 	};
 
-	return { start, stop, subscribe: _store.subscribe };
+	return ticker;
 };
