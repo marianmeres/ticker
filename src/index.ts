@@ -1,7 +1,5 @@
 import { createStore } from '@marianmeres/store';
 
-const now = () => (typeof window !== 'undefined' ? window.performance.now() : Date.now());
-
 export const createTicker = (interval = 1000) => {
 	const _store = createStore(0);
 	let _timerId: any = 0;
@@ -14,7 +12,7 @@ export const createTicker = (interval = 1000) => {
 	}
 
 	const _tick = () => {
-		_store.set(now());
+		_store.set(Date.now());
 		_timerId = setTimeout(_tick, interval);
 	};
 
