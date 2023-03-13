@@ -8,7 +8,7 @@ export const createTicker = (interval = 1000) => {
 
 	interval = parseInt(interval as any, 10);
 	if (isNaN(interval) || interval < 0) {
-		throw new Error(
+		throw new TypeError(
 			`Invalid interval. Expecting positive non-zero number of milliseconds.`
 		);
 	}
