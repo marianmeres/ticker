@@ -1,5 +1,7 @@
-export declare const createTicker: (interval?: number) => {
-    subscribe: (cb: Function) => Function;
-    start: () => any;
-    stop: () => any;
-};
+interface Ticker {
+    subscribe: (cb: (timestamp: number) => void) => Function;
+    start: () => Ticker;
+    stop: () => Ticker;
+}
+export declare const createTicker: (interval?: number, start?: boolean) => Ticker;
+export {};

@@ -80,7 +80,7 @@ suite.test('tick sleep stop start', async () => {
 	unsub();
 });
 
-suite.test('multiple subscribers', async () => {
+suite.test('multiple subs', async () => {
 	const t = createTicker(10);
 	const log1 = [];
 	const log2 = [];
@@ -102,6 +102,14 @@ suite.test('multiple subscribers', async () => {
 	assert(log2.length === 5);
 
 	// cleanup
+	t.stop();
+});
+
+suite.test('chain api', async () => {
+	const t = createTicker(10);
+	const log = [];
+	t.start().subscribe((v) => log.push(v))();
+	assert(log.length === 1);
 	t.stop();
 });
 

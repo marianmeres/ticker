@@ -1,6 +1,12 @@
 import { createStore } from '@marianmeres/store';
 
-export const createTicker = (interval = 1000) => {
+interface Ticker {
+	subscribe: (cb: (timestamp: number) => void) => Function;
+	start: () => Ticker;
+	stop: () => Ticker;
+}
+
+export const createTicker = (interval = 1000, start = false): Ticker => {
 	interval = parseInt(interval as any, 10);
 	if (isNaN(interval) || interval < 0) {
 		throw new TypeError(
@@ -31,6 +37,9 @@ export const createTicker = (interval = 1000) => {
 			return ticker;
 		}
 	};
+
+	// start now?
+	if (start) ticker.start();
 
 	return ticker;
 };
