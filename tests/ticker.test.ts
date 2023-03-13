@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { createClog } from '@marianmeres/clog';
 import { TestRunner } from '@marianmeres/test-runner';
 import { createTicker } from '../src/index.js';
+import { log } from "util";
 
 const clog = createClog(path.basename(fileURLToPath(import.meta.url)));
 const suite = new TestRunner(path.basename(fileURLToPath(import.meta.url)));
@@ -14,9 +15,7 @@ suite.test('tick tick', async () => {
 	const t = createTicker(10);
 	const log = [];
 
-	const unsub = t.subscribe((v) => {
-		log.push(v);
-	});
+	const unsub = t.subscribe((v) => log.push(v));
 
 	// subscribe must have added zero (inactive timer)
 	assert(log.length === 1);
@@ -41,20 +40,18 @@ suite.test('tick sleep unsub', async () => {
 	const t = createTicker(10);
 	const log = [];
 
-	const unsub = t.subscribe((v) => {
-		log.push(v);
-	});
+	const unsub = t.subscribe((v) => log.push(v));
 
 	t.start();
 	await sleep(15);
 	unsub();
 
-	// 0, ts, ts, 0
-	assert(log.length === 4);
+	// 0, ts, ts
+	assert(log.length === 3);
 
 	// starting again must have no effect, since we're unsubscribed
 	t.start();
-	assert(log.length === 4);
+	assert(log.length === 3);
 
 	// cleanup
 	t.stop();
@@ -64,9 +61,7 @@ suite.test('tick sleep stop start', async () => {
 	const t = createTicker(10);
 	const log = [];
 
-	const unsub = t.subscribe((v) => {
-		log.push(v);
-	});
+	const unsub = t.subscribe((v) => log.push(v));
 
 	t.start();
 	await sleep(15);
@@ -83,6 +78,31 @@ suite.test('tick sleep stop start', async () => {
 
 	// clenaup
 	unsub();
+});
+
+suite.test('multiple subscribers', async () => {
+	const t = createTicker(10);
+	const log1 = [];
+	const log2 = [];
+
+	const unsub1 = t.subscribe((v) => log1.push(v));
+	const unsub2 = t.subscribe((v) => log2.push(v));
+
+	t.start();
+	await sleep(19);
+	unsub1();
+
+	await sleep(19);
+	unsub2();
+
+	// 0, ts, ts
+	assert(log1.length === 3);
+
+	// 0, ts, ts, ts, ts
+	assert(log2.length === 5);
+
+	// cleanup
+	t.stop();
 });
 
 export default suite;

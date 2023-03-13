@@ -1,15 +1,15 @@
 import { createStore } from '@marianmeres/store';
 
 export const createTicker = (interval = 1000) => {
-	const _store = createStore(0);
-	let _timerId: any = 0;
-
 	interval = parseInt(interval as any, 10);
 	if (isNaN(interval) || interval < 0) {
 		throw new TypeError(
 			`Invalid interval. Expecting positive non-zero number of milliseconds.`
 		);
 	}
+
+	const _store = createStore(0);
+	let _timerId: any = 0;
 
 	const _tick = () => {
 		_store.set(Date.now());
@@ -26,15 +26,5 @@ export const createTicker = (interval = 1000) => {
 		}
 	};
 
-	return {
-		start,
-		stop,
-		subscribe: (cb: Function) => {
-			const unsub = _store.subscribe(cb);
-			return () => {
-				stop();
-				unsub();
-			};
-		},
-	};
+	return { start, stop, subscribe: _store.subscribe };
 };
