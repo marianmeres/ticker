@@ -2,7 +2,8 @@
 
 Do something when it ticks.
 
-(Effectively just a `setInterval` with a friendlier API.)
+(Effectively just a `setInterval` with a friendlier and
+[store compatible](https://github.com/marianmeres/store) API.)
 
 ## Install
 ```shell
