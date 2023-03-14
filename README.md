@@ -2,7 +2,7 @@
 
 Do something when it ticks.
 
-Effectively just a `setInterval` with a friendlier and
+Effectively just like a `setInterval` with a friendlier and
 [store compatible](https://github.com/marianmeres/store) API.
 
 ## Install
