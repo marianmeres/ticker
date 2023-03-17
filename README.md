@@ -5,6 +5,14 @@ Do something when it ticks.
 Effectively just like a `setInterval` with a friendlier and
 [store compatible](https://github.com/marianmeres/store) API.
 
+Technical detail: under the hood this uses just plain and "stupid" [recursive `setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency),
+which means that it guarantees the **delay** between the calls, not the actual **frequency**.
+It is good enough for general application uses cases, but it currently may not be the best
+option for specific needs where you need to rely on high resolution frequency accuracy
+(e.g. animations).
+
+It will be improved in future version.
+
 ## Install
 ```shell
 $ npm i @marianmeres/ticker
