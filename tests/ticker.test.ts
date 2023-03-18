@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { createClog } from '@marianmeres/clog';
 import { TestRunner } from '@marianmeres/test-runner';
 import { createTicker } from '../src/index.js';
-import { log } from "util";
+import { log } from 'util';
 
 const clog = createClog(path.basename(fileURLToPath(import.meta.url)));
 const suite = new TestRunner(path.basename(fileURLToPath(import.meta.url)));
@@ -43,6 +43,7 @@ suite.test('tick sleep unsub', async () => {
 	const unsub = t.subscribe((v) => log.push(v));
 
 	t.start();
+
 	await sleep(15);
 	unsub();
 

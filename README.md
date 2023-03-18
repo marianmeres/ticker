@@ -5,13 +5,8 @@ Do something when it ticks.
 Effectively just like a `setInterval` with a friendlier and
 [store compatible](https://github.com/marianmeres/store) API.
 
-## Limitations
-Under the hood this uses "stupid" [recursive `setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency),
-which means that it guarantees the **delay** between the calls, not the actual **frequency**.
-Although it is good enough for most use cases, it may not be the best option when you
-need to rely on high resolution frequency accuracy (e.g. animations).
-
-(Maybe) it will be improved in future version.
+Under the hood it uses [recursive `setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency)
+with delay corrections, so it should guarantee the frequency.
 
 ## Install
 ```shell

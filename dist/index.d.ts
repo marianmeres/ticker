@@ -4,5 +4,5 @@ interface Ticker {
     stop: () => Ticker;
     setInterval: (ms: number) => Ticker;
 }
-export declare const createTicker: (interval?: number, start?: boolean) => Ticker;
+export declare const createTicker: (interval?: number, start?: boolean, logger?: any) => Ticker;
 export {};
