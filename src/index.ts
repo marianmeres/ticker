@@ -33,25 +33,27 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 	const _tick = () => {
 		const _start = now();
 
-		// initialize to now, if starting
+		// initialize (if needed)
 		_lastTick ||= _start;
 
 		// publish the tick... which is a sync call, which may trigger loads of work...
 		_store.set(_start);
 
-		// so it could have lasted some significant time...
-		const _duration = _start - _lastTick;
+		// so it could have taken some time...
+		const _duration = now() - _lastTick;
 		const _offset = _duration ? _duration - interval : 0;
 
-		// so plan the next call schedule with potential correction
+		// so maybe adjust the next call schedule
 		const _nextInterval = Math.max(0, interval - _offset);
 		_timerId = setTimeout(_tick, _nextInterval);
-		_log({ _start, _duration, _offset, _nextInterval });
 
-		// finally, save this tick's now for the next call...
+		// save for the next tick...
 		_lastTick = now();
 
-		// the initial "keep it simple and stupid" implementation:
+		// debug
+		_log({ _start, _duration, _offset, _nextInterval });
+
+		// the basic approach:
 		// _store.set(Date.now());
 		// _timerId = setTimeout(_tick, interval);
 	};
