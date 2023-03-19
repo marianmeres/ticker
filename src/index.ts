@@ -29,26 +29,26 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 	let _timerId: any = 0;
 
 	//
-	let _lastTick = 0;
+	let _last = 0;
 	const _tick = () => {
 		const _start = now();
 
-		// initialize (if needed)
-		_lastTick ||= _start;
+		// maybe initialize
+		_last ||= _start;
 
-		// publish the tick... which is a sync call, which may trigger loads of work...
+		// publish the tick (which is a sync call, which may trigger loads of work)
 		_store.set(_start);
 
-		// so it could have taken some time...
-		const _duration = now() - _lastTick;
+		// which could have taken some time, so calculate the offset
+		const _duration = now() - _last;
 		const _offset = _duration ? _duration - interval : 0;
 
-		// so maybe adjust the next call schedule
+		// schedule next tick while applying the offset
 		const _nextInterval = Math.max(0, interval - _offset);
 		_timerId = setTimeout(_tick, _nextInterval);
 
-		// save for the next tick...
-		_lastTick = now();
+		//
+		_last = now();
 
 		// debug
 		_log({ _start, _duration, _offset, _nextInterval });
@@ -70,7 +70,7 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 				clearTimeout(_timerId);
 				_timerId = 0;
 			}
-			_lastTick = 0;
+			_last = 0;
 			return ticker;
 		},
 		setInterval: (ms: number) => {
