@@ -7,10 +7,6 @@ so it should guarantee the precise frequency **except** for the edge cases where
 subscriber's work cannot keep up with the interval - it will never tick sooner before it
 finishes.
 
-If you need to do an asynchronous periodical job with potentially greater latency than
-the defined interval (such as a http request every x seconds) you should rather use
-the [simpler approach which quarantees the delay, not the frequency](https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency).
-
 ## Install
 ```shell
 $ npm i @marianmeres/ticker
@@ -34,7 +30,7 @@ const unsub = t.subscribe((timestamp) => {
     if (timestamp) {
         // do something on tick
     } else {
-        // ticker is stopped
+        // ticker is stopped (or has not started yet)
     }
 });
 ```
