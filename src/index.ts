@@ -15,7 +15,7 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 
 	const _setInterval = (ms) => {
 		ms = parseInt(ms as any, 10);
-		if (isNaN(ms) || ms <= 0) {
+		if (Number.isNaN(ms) || ms <= 0) {
 			throw new TypeError(
 				`Invalid interval. Expecting positive non-zero number of milliseconds.`
 			);
