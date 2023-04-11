@@ -37,7 +37,8 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 		_last ||= _start;
 
 		// publish the tick (which is a sync call, which may trigger loads of work)
-		_store.set(_start);
+		// (always tick Date.now value, not performance.now, since it's page load relative)
+		_store.set(Date.now());
 
 		// which could have taken some time, so calculate the offset
 		const _duration = now() - _last;
