@@ -1,10 +1,14 @@
 import { createStore } from '@marianmeres/store';
 
+// Because svelte uses "() => any" signature in onMount/onDestroy...
+// Argument of type 'Function' is not assignable to parameter of type '() => any'.
+type Fn = () => any;
+
 interface Ticker {
-	subscribe: (cb: (timestamp: number) => void) => Function;
+	subscribe: (cb: (timestamp: Number) => void) => Fn;
 	start: () => Ticker;
 	stop: () => Ticker;
-	setInterval: (ms: number) => Ticker;
+	setInterval: (ms: Number) => Ticker;
 }
 
 const now = () => (typeof window !== 'undefined' ? window.performance.now() : Date.now());
@@ -25,7 +29,7 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 
 	// initialize
 	_setInterval(interval);
-	const _store = createStore(0);
+	const _store = createStore<Number>(0);
 	let _timerId: any = 0;
 
 	//
@@ -74,7 +78,7 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 			_last = 0;
 			return ticker;
 		},
-		setInterval: (ms: number) => {
+		setInterval: (ms: Number) => {
 			_setInterval(ms);
 			return ticker;
 		},
