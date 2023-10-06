@@ -9,19 +9,21 @@ interface Ticker {
 
 const now = () => (typeof window !== 'undefined' ? window.performance.now() : Date.now());
 
+const _assertValidInterval = (ms: number) => {
+	ms = parseInt(ms as any, 10);
+	if (Number.isNaN(ms) || ms <= 0) {
+		throw new TypeError(
+			`Invalid interval. Expecting positive non-zero number of milliseconds.`
+		);
+	}
+	return ms;
+};
+
 export const createTicker = (interval = 1000, start = false, logger = null): Ticker => {
 	// for debug
 	const _log = (...v) => (typeof logger === 'function' ? logger.apply(null, v) : null);
 
-	const _setInterval = (ms) => {
-		ms = parseInt(ms as any, 10);
-		if (Number.isNaN(ms) || ms <= 0) {
-			throw new TypeError(
-				`Invalid interval. Expecting positive non-zero number of milliseconds.`
-			);
-		}
-		interval = ms;
-	};
+	const _setInterval = (ms) => (interval = _assertValidInterval(ms));
 
 	// initialize
 	_setInterval(interval);
@@ -72,6 +74,88 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 				_timerId = 0;
 			}
 			_last = 0;
+			return ticker;
+		},
+		setInterval: (ms: number) => {
+			_setInterval(ms);
+			return ticker;
+		},
+	};
+
+	// start now?
+	if (start) ticker.start();
+
+	return ticker;
+};
+
+//
+interface RecTickerVal {
+	started: number;
+	finished: number;
+	error: any;
+	result: any;
+}
+
+interface RecursiveTicker {
+	subscribe: (cb: (previous: RecTickerVal) => void) => CallableFunction;
+	start: () => RecursiveTicker;
+	stop: () => RecursiveTicker;
+	setInterval: (ms: number) => RecursiveTicker;
+}
+
+//
+export const createRecursiveTicker = (
+	worker: CallableFunction,
+	interval = 1000,
+	start = false
+): RecursiveTicker => {
+	const _setInterval = (ms) => (interval = _assertValidInterval(ms));
+
+	// prettier-ignore
+	const _createVal = (o: Partial<RecTickerVal> = {}): RecTickerVal => ({
+		started: 0, finished: 0, error: null, result: null, ...(o || {}),
+	});
+
+	// initialize
+	_setInterval(interval);
+	const _store = createStore<RecTickerVal>(_createVal());
+	let _timerId: any = 0;
+	let _isStarted: boolean = start;
+
+	//
+	const _tick = async () => {
+		const started = now();
+		let result;
+		try {
+			const previous = _store.get();
+			_store.set(_createVal({ started }));
+			result = await worker(previous);
+			// update only if has not been stopped in the meantime...
+			_isStarted && _store.set(_createVal({ started, finished: now(), result }));
+		} catch (error) {
+			_isStarted && _store.set(_createVal({ started, finished: now(), error }));
+		}
+
+		//
+		if (_isStarted) {
+			_timerId && clearTimeout(_timerId);
+			_timerId = setTimeout(_tick, interval);
+		}
+	};
+
+	const ticker = {
+		subscribe: _store.subscribe,
+		start: () => {
+			_isStarted = true;
+			!_timerId && _tick();
+			return ticker;
+		},
+		stop: () => {
+			if (_timerId) {
+				clearTimeout(_timerId);
+				_timerId = 0;
+			}
+			_isStarted = false;
 			return ticker;
 		},
 		setInterval: (ms: number) => {
