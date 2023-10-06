@@ -1,10 +1,9 @@
-import path from 'node:path';
-import { strict as assert } from 'node:assert';
-import { fileURLToPath } from 'node:url';
 import { createClog } from '@marianmeres/clog';
 import { TestRunner } from '@marianmeres/test-runner';
+import { strict as assert } from 'node:assert';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createTicker } from '../src/index.js';
-import { log } from 'util';
 
 const clog = createClog(path.basename(fileURLToPath(import.meta.url)));
 const suite = new TestRunner(path.basename(fileURLToPath(import.meta.url)));
@@ -13,7 +12,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 suite.test('tick tick', async () => {
 	const t = createTicker(10);
-	const log = [];
+	const log: number[] = [];
 
 	const unsub = t.subscribe((v) => log.push(v));
 
@@ -38,7 +37,7 @@ suite.test('tick tick', async () => {
 
 suite.test('tick sleep unsub', async () => {
 	const t = createTicker(10);
-	const log = [];
+	const log: number[] = [];
 
 	const unsub = t.subscribe((v) => log.push(v));
 
@@ -60,7 +59,7 @@ suite.test('tick sleep unsub', async () => {
 
 suite.test('tick sleep stop start', async () => {
 	const t = createTicker(10);
-	const log = [];
+	const log: number[] = [];
 
 	const unsub = t.subscribe((v) => log.push(v));
 
@@ -77,14 +76,14 @@ suite.test('tick sleep stop start', async () => {
 	// @ts-ignore
 	assert(log.length === 5);
 
-	// clenaup
+	// cleanup
 	unsub();
 });
 
 suite.test('multiple subs', async () => {
 	const t = createTicker(10);
-	const log1 = [];
-	const log2 = [];
+	const log1: number[] = [];
+	const log2: number[] = [];
 
 	const unsub1 = t.subscribe((v) => log1.push(v));
 	const unsub2 = t.subscribe((v) => log2.push(v));
@@ -108,7 +107,7 @@ suite.test('multiple subs', async () => {
 
 suite.test('chain api', async () => {
 	const t = createTicker(10);
-	const log = [];
+	const log: number[] = [];
 	t.start().subscribe((v) => log.push(v))();
 	assert(log.length === 1);
 	t.stop();
