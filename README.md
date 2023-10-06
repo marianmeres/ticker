@@ -3,7 +3,8 @@
 Do something when it ticks. With a [store compatible](https://github.com/marianmeres/store) API.
 
 Under the hood it uses recursive `setTimeout` with interval corrections,
-so it should guarantee the precise frequency **except** for the edge cases where the synchronous
+so it should guarantee the precise frequency **except** for the edge cases where the
+**synchronous**
 subscriber's work cannot keep up with the interval - it will never tick sooner before it
 finishes.
 
@@ -39,32 +40,32 @@ const unsub = t.subscribe((timestamp) => {
 });
 ```
 
-## Recursive Ticker
+## Delayed Worker Ticker
 
-For periodical async work (e.g. periodical api data fetching) using a tick signal from a sync
-ticker shown above [may not be the best option](https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency).
-For such cases use it's "recursive" sibling. Instead of frequency it guarantees the delay
-between the ticks.
+Using a tick signal from a sync ticker shown above for a periodical **asynchronous** work
+(e.g. periodical api data fetching) [may not be the best option](https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency).
+For such cases use it's "delayed" sibling. Instead of frequency it guarantees the delay
+between the worker calls.
 
-## Recursive Ticker Usage
+## Delayed Worker Ticker Usage
 
 ```typescript
-import { createRecursiveTicker } from '@marianmeres/ticker';
+import { createDelayedWorkerTicker } from '@marianmeres/ticker';
 
-// once started, will do the work, then pause 1 second, and repeat...
+// once started, it will do the work, then pause for 1 second, then repeat...
 // (worker: CallableFunction, interval = 1000, start = false): RecursiveTicker
-const t = createRecursiveTicker(async () => fetch('/api'), 1_000);
+const t = createDelayedWorkerTicker(async () => fetch('/api'), 1_000);
 
-// control api works normally
+// control api
 t.start();
 t.stop();
 t.setInterval(ms);
 
 // subscribe api
 const unsub = t.subscribe(({ started, finished, error, result }) => {
-	// both `started` and `finished` are timestamps or zero
+	// both `started` and `finished` are timestamps (or zero)
 	if (started && !finished) {
-		// work is in progress
+		// worker's work is in progress
 	} else if (started && finished) {
 		// do something with `result` or `error`
 	} else {

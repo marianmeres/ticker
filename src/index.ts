@@ -89,36 +89,36 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 };
 
 //
-interface RecTickerVal {
+interface DelayedTickerVal {
 	started: number;
 	finished: number;
 	error: any;
 	result: any;
 }
 
-interface RecursiveTicker {
-	subscribe: (cb: (previous: RecTickerVal) => void) => CallableFunction;
-	start: () => RecursiveTicker;
-	stop: () => RecursiveTicker;
-	setInterval: (ms: number) => RecursiveTicker;
+interface DelayedWorkerTicker {
+	subscribe: (cb: (previous: DelayedTickerVal) => void) => CallableFunction;
+	start: () => DelayedWorkerTicker;
+	stop: () => DelayedWorkerTicker;
+	setInterval: (ms: number) => DelayedWorkerTicker;
 }
 
 //
-export const createRecursiveTicker = (
+export const createDelayedWorkerTicker = (
 	worker: CallableFunction,
 	interval = 1000,
 	start = false
-): RecursiveTicker => {
+): DelayedWorkerTicker => {
 	const _setInterval = (ms) => (interval = _assertValidInterval(ms));
 
 	// prettier-ignore
-	const _createVal = (o: Partial<RecTickerVal> = {}): RecTickerVal => ({
+	const _createVal = (o: Partial<DelayedTickerVal> = {}): DelayedTickerVal => ({
 		started: 0, finished: 0, error: null, result: null, ...(o || {}),
 	});
 
 	// initialize
 	_setInterval(interval);
-	const _store = createStore<RecTickerVal>(_createVal());
+	const _store = createStore<DelayedTickerVal>(_createVal());
 	let _timerId: any = 0;
 	let _isStarted: boolean = start;
 
