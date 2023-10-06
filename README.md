@@ -41,16 +41,17 @@ const unsub = t.subscribe((timestamp) => {
 
 ## Recursive Ticker
 
-For periodical async work (e.g. periodical api data fetching) using a tick signal from sync
+For periodical async work (e.g. periodical api data fetching) using a tick signal from a sync
 ticker shown above [may not be the best option](https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency).
-For such cases use it's "recursive" sibling. It
-guarantees that it will not tick again before the previous work has finishes.
+For such cases use it's "recursive" sibling. Instead of frequency it guarantees the delay
+between the ticks.
 
 ## Recursive Ticker Usage
 
 ```typescript
 import { createRecursiveTicker } from '@marianmeres/ticker';
 
+// once started, will do the work, then pause 1 second, and repeat...
 // (worker: CallableFunction, interval = 1000, start = false): RecursiveTicker
 const t = createRecursiveTicker(async () => fetch('/api'), 1_000);
 
