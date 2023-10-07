@@ -127,21 +127,21 @@ export const createDelayedWorkerTicker = (
 	//
 	const _tick = async () => {
 		if (!_isStarted) return;
-		const started = now();
-		let result;
+		const started = Date.now();
 		try {
 			const previous = _store.get();
 			_store.set(_createVal({ started }));
-			result = await worker(previous);
+			const result = await worker(previous);
 			// update only if has not been stopped in the meantime...
-			_isStarted && _store.set(_createVal({ started, finished: now(), result }));
+			_isStarted && _store.set(_createVal({ started, finished: Date.now(), result }));
 		} catch (error) {
-			_isStarted && _store.set(_createVal({ started, finished: now(), error }));
+			_isStarted && _store.set(_createVal({ started, finished: Date.now(), error }));
 		}
 
 		//
 		if (_isStarted) {
 			_timerId && clearTimeout(_timerId);
+			// no need to adjust interval here
 			_timerId = setTimeout(_tick, interval);
 		}
 	};
