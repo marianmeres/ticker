@@ -53,7 +53,7 @@ between the worker calls.
 import { createDelayedWorkerTicker } from '@marianmeres/ticker';
 
 // once started, it will do the work, then pause for 1 second, then repeat...
-// (worker: CallableFunction, interval = 1000, start = false): RecursiveTicker
+// (worker: CallableFunction, interval = 1000, start = false): DelayedWorkerTicker
 const t = createDelayedWorkerTicker(async () => fetch('/api'), 1_000);
 
 // control api
