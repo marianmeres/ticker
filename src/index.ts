@@ -119,11 +119,14 @@ export const createDelayedWorkerTicker = (
 	// initialize
 	_setInterval(interval);
 	const _store = createStore<DelayedTickerVal>(_createVal());
+
+	//
 	let _timerId: any = 0;
 	let _isStarted: boolean = start;
 
 	//
 	const _tick = async () => {
+		if (!_isStarted) return;
 		const started = now();
 		let result;
 		try {
