@@ -35,7 +35,7 @@ const unsub = t.subscribe((timestamp) => {
 	if (timestamp) {
 		// do something on tick
 	} else {
-		// ticker is stopped (or has not start yet)
+		// ticker is stopped (or has not started yet)
 	}
 });
 ```
@@ -69,7 +69,7 @@ const unsub = t.subscribe(({ started, finished, error, result }) => {
 	} else if (started && finished) {
 		// do something with `result` or `error`
 	} else {
-		// ticker is stopped (or has not start yet)
+		// ticker is stopped (or has not started yet)
 	}
 });
 ```
