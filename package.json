@@ -1,6 +1,6 @@
 {
 	"name": "@marianmeres/ticker",
-	"version": "1.6.0",
+	"version": "1.7.0",
 	"description": "Do something when it ticks.",
 	"type": "module",
 	"main": "./dist/index.cjs",
