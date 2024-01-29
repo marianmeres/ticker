@@ -1,10 +1,12 @@
 import { createStore } from '@marianmeres/store';
 
+type Interval = number | ((previous: number) => number);
+
 interface Ticker {
 	subscribe: (cb: (timestamp: number) => void) => CallableFunction;
 	start: () => Ticker;
 	stop: () => Ticker;
-	setInterval: (ms: number) => Ticker;
+	setInterval: (msOrFn: Interval) => Ticker;
 }
 
 const now = () => (typeof window !== 'undefined' ? window.performance.now() : Date.now());
@@ -19,14 +21,18 @@ const _assertValidInterval = (ms: number) => {
 	return ms;
 };
 
-export const createTicker = (interval = 1000, start = false, logger = null): Ticker => {
+export const createTicker = (
+	interval: Interval = 1000,
+	start = false,
+	logger = null
+): Ticker => {
 	// for debug
 	const _log = (...v) => (typeof logger === 'function' ? logger.apply(null, v) : null);
-
-	const _setInterval = (ms) => (interval = _assertValidInterval(ms));
+	const _getInterval = (previous: number) =>
+		_assertValidInterval(typeof interval === 'function' ? interval(previous) : interval);
 
 	// initialize
-	_setInterval(interval);
+	let _previousInterval = _getInterval(0);
 	const _store = createStore<number>(0);
 	let _timerId: any = 0;
 
@@ -44,11 +50,12 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 
 		// which could have taken some time, so calculate the offset
 		const _duration = now() - _last;
-		const _offset = _duration ? _duration - interval : 0;
+		const _offset = _duration ? _duration - _previousInterval : 0;
 
 		// schedule next tick while applying the offset
-		const _nextInterval = Math.max(0, interval - _offset);
+		const _nextInterval = Math.max(0, _getInterval(_previousInterval) - _offset);
 		_timerId = setTimeout(_tick, _nextInterval);
+		_previousInterval = _nextInterval;
 
 		//
 		_last = now();
@@ -74,10 +81,11 @@ export const createTicker = (interval = 1000, start = false, logger = null): Tic
 				_timerId = 0;
 			}
 			_last = 0;
+			_previousInterval = 0;
 			return ticker;
 		},
-		setInterval: (ms: number) => {
-			_setInterval(ms);
+		setInterval: (msOrFn: Interval) => {
+			interval = msOrFn;
 			return ticker;
 		},
 	};
@@ -100,16 +108,17 @@ interface DelayedWorkerTicker {
 	subscribe: (cb: (previous: DelayedTickerVal) => void) => CallableFunction;
 	start: () => DelayedWorkerTicker;
 	stop: () => DelayedWorkerTicker;
-	setInterval: (ms: number) => DelayedWorkerTicker;
+	setInterval: (ms: Interval) => DelayedWorkerTicker;
 }
 
 //
 export const createDelayedWorkerTicker = (
 	worker: CallableFunction,
-	interval = 1000,
+	interval: Interval = 1000,
 	start = false
 ): DelayedWorkerTicker => {
-	const _setInterval = (ms) => (interval = _assertValidInterval(ms));
+	const _getInterval = (previous: number) =>
+		_assertValidInterval(typeof interval === 'function' ? interval(previous) : interval);
 
 	// prettier-ignore
 	const _createVal = (o: Partial<DelayedTickerVal> = {}): DelayedTickerVal => ({
@@ -117,7 +126,7 @@ export const createDelayedWorkerTicker = (
 	});
 
 	// initialize
-	_setInterval(interval);
+	let _previousInterval = 0;
 	const _store = createStore<DelayedTickerVal>(_createVal());
 
 	//
@@ -142,7 +151,9 @@ export const createDelayedWorkerTicker = (
 		if (_isStarted) {
 			_timerId && clearTimeout(_timerId);
 			// no need to adjust interval here
-			_timerId = setTimeout(_tick, interval);
+			const _nextInterval = _getInterval(_previousInterval || 0);
+			_timerId = setTimeout(_tick, _nextInterval);
+			_previousInterval = _nextInterval;
 		}
 	};
 
@@ -159,10 +170,11 @@ export const createDelayedWorkerTicker = (
 				_timerId = 0;
 			}
 			_isStarted = false;
+			_previousInterval = 0;
 			return ticker;
 		},
-		setInterval: (ms: number) => {
-			_setInterval(ms);
+		setInterval: (msOrFn: Interval) => {
+			interval = msOrFn;
 			return ticker;
 		},
 	};

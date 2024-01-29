@@ -36,7 +36,7 @@ suite.test('tick tick', async () => {
 });
 
 suite.test('tick sleep unsub', async () => {
-	const t = createTicker(10);
+	const t = createTicker(() => 10);
 	const log: number[] = [];
 
 	const unsub = t.subscribe((v) => log.push(v));

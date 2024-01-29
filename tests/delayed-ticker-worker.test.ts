@@ -43,7 +43,11 @@ suite.test('delayed ticker', async () => {
 
 suite.test('delayed ticker restart', async () => {
 	let i = 0;
-	const t = createDelayedWorkerTicker(async (previousVal) => ++i, 10, false);
+	const t = createDelayedWorkerTicker(
+		async (previousVal) => ++i,
+		() => 10,
+		false
+	);
 	const log: any[] = [];
 
 	const unsub = t.subscribe((v) => log.push(v));

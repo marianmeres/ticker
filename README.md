@@ -73,3 +73,11 @@ const unsub = t.subscribe(({ started, finished, error, result }) => {
 	}
 });
 ```
+
+## Interval value as a function
+
+If desired, you can define the interval value as a function which returns the number of ms.
+
+```typescript
+type Interval = number | ((previous: number) => number);
+```
