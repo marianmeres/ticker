@@ -1,4 +1,4 @@
-type Interval = number | ((previous: number) => number);
+type Interval = number | ((previous: number, storeVal: any) => number);
 interface Ticker {
     subscribe: (cb: (timestamp: number) => void) => CallableFunction;
     start: () => Ticker;

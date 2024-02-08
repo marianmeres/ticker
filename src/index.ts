@@ -1,6 +1,6 @@
 import { createStore } from '@marianmeres/store';
 
-type Interval = number | ((previous: number) => number);
+type Interval = number | ((previous: number, storeVal: any) => number);
 
 interface Ticker {
 	subscribe: (cb: (timestamp: number) => void) => CallableFunction;
@@ -28,13 +28,17 @@ export const createTicker = (
 ): Ticker => {
 	// for debug
 	const _log = (...v) => (typeof logger === 'function' ? logger.apply(null, v) : null);
-	const _getInterval = (previous: number) =>
-		_assertValidInterval(typeof interval === 'function' ? interval(previous) : interval);
 
 	// initialize
-	let _previousInterval = _getInterval(0);
 	const _store = createStore<number>(0);
 	let _timerId: any = 0;
+
+	//
+	const _getInterval = (previous: number) =>
+		_assertValidInterval(
+			typeof interval === 'function' ? interval(previous, _store.get()) : interval
+		);
+	let _previousInterval = _getInterval(0);
 
 	//
 	let _last = 0;
@@ -117,9 +121,6 @@ export const createDelayedWorkerTicker = (
 	interval: Interval = 1000,
 	start = false
 ): DelayedWorkerTicker => {
-	const _getInterval = (previous: number) =>
-		_assertValidInterval(typeof interval === 'function' ? interval(previous) : interval);
-
 	// prettier-ignore
 	const _createVal = (o: Partial<DelayedTickerVal> = {}): DelayedTickerVal => ({
 		started: 0, finished: 0, error: null, result: null, ...(o || {}),
@@ -128,6 +129,11 @@ export const createDelayedWorkerTicker = (
 	// initialize
 	let _previousInterval = 0;
 	const _store = createStore<DelayedTickerVal>(_createVal());
+
+	const _getInterval = (previous: number) =>
+		_assertValidInterval(
+			typeof interval === 'function' ? interval(previous, _store.get()) : interval
+		);
 
 	//
 	let _timerId: any = 0;
@@ -142,7 +148,8 @@ export const createDelayedWorkerTicker = (
 			_store.set(_createVal({ started }));
 			const result = await worker(previous);
 			// update only if has not been stopped in the meantime...
-			_isStarted && _store.set(_createVal({ started, finished: Date.now(), result }));
+			_isStarted &&
+				_store.set(_createVal({ started, finished: Date.now(), error: null, result }));
 		} catch (error) {
 			_isStarted && _store.set(_createVal({ started, finished: Date.now(), error }));
 		}
