@@ -44,8 +44,8 @@ const unsub = t.subscribe((timestamp) => {
 
 Using a tick signal from a sync ticker shown above for a periodical **asynchronous** work
 (e.g. periodical api data fetching) [may not be the best choice](https://developer.mozilla.org/en-US/docs/Web/API/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency).
-For such cases use its "delayed" sibling. Instead of frequency it guarantees a delay
-between the worker calls.
+For such cases, use its "delayed" sibling. Instead of frequency, it guarantees a delay
+between worker calls.
 
 ## Delayed Worker Ticker Usage
 
