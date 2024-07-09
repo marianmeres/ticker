@@ -24,7 +24,7 @@ const _assertValidInterval = (ms: number) => {
 export const createTicker = (
 	interval: Interval = 1000,
 	start = false,
-	logger = null
+	logger: any = null
 ): Ticker => {
 	// for debug
 	const _log = (...v) => (typeof logger === 'function' ? logger.apply(null, v) : null);
@@ -40,9 +40,14 @@ export const createTicker = (
 		);
 	let _previousInterval = _getInterval(0);
 
+	// special case flag to be able to stop from inside
+	let _stopped = false;
+
 	//
 	let _last = 0;
 	const _tick = () => {
+		if (_stopped) return;
+
 		const _start = now();
 
 		// maybe initialize
@@ -75,10 +80,12 @@ export const createTicker = (
 	const ticker = {
 		subscribe: _store.subscribe,
 		start: () => {
+			_stopped = false;
 			!_timerId && _tick();
 			return ticker;
 		},
 		stop: () => {
+			_stopped = true;
 			_store.set(0);
 			if (_timerId) {
 				clearTimeout(_timerId);

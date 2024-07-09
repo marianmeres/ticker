@@ -113,4 +113,23 @@ suite.test('chain api', async () => {
 	t.stop();
 });
 
+suite.test('test from subscribe', async () => {
+	const _log: any[] = [];
+	const t = createTicker(5, false, (v: any) => _log.push(v));
+	let i = 0;
+
+	t.subscribe((v) => {
+		if (!v) return;
+		if (i++ === 3) t.stop();
+		// clog(i);
+	});
+
+	t.start();
+	await sleep(100);
+	t.stop();
+
+	assert(_log.length === 4);
+	assert(i === 4);
+});
+
 export default suite;
