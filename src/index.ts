@@ -41,13 +41,11 @@ export const createTicker = (
 	let _previousInterval = _getInterval(0);
 
 	// special case flag to be able to stop from inside
-	let _stopped = false;
+	let _isStarted = start;
 
 	//
 	let _last = 0;
 	const _tick = () => {
-		if (_stopped) return;
-
 		const _start = now();
 
 		// maybe initialize
@@ -56,6 +54,9 @@ export const createTicker = (
 		// publish the tick (which is a sync call, which may trigger loads of work)
 		// (always tick Date.now value, not performance.now, since it's page load relative)
 		_store.set(Date.now());
+
+		// we might have stopped from inside the subscriber, so return early
+		if (!_isStarted) return;
 
 		// which could have taken some time, so calculate the offset
 		const _duration = now() - _last;
@@ -80,12 +81,12 @@ export const createTicker = (
 	const ticker = {
 		subscribe: _store.subscribe,
 		start: () => {
-			_stopped = false;
+			_isStarted = true;
 			!_timerId && _tick();
 			return ticker;
 		},
 		stop: () => {
-			_stopped = true;
+			_isStarted = false;
 			_store.set(0);
 			if (_timerId) {
 				clearTimeout(_timerId);

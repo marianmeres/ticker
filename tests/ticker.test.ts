@@ -128,8 +128,8 @@ suite.test('test from subscribe', async () => {
 	await sleep(100);
 	t.stop();
 
-	assert(_log.length === 4);
 	assert(i === 4);
+	assert(_log.length === 3);
 });
 
 export default suite;
