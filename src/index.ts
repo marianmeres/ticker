@@ -96,6 +96,10 @@ export const createTicker = (
 			_previousInterval = 0;
 			return ticker;
 		},
+		toggle: () => {
+			_isStarted ? ticker.stop() : ticker.start();
+			return ticker;
+		},
 		setInterval: (msOrFn: Interval) => {
 			interval = msOrFn;
 			return ticker;
