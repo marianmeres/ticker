@@ -100,6 +100,7 @@ export const createTicker = (
 			_isStarted ? ticker.stop() : ticker.start();
 			return ticker;
 		},
+		isStarted: () => _isStarted,
 		setInterval: (msOrFn: Interval) => {
 			interval = msOrFn;
 			return ticker;
@@ -192,6 +193,11 @@ export const createDelayedWorkerTicker = (
 			_previousInterval = 0;
 			return ticker;
 		},
+		toggle: () => {
+			_isStarted ? ticker.stop() : ticker.start();
+			return ticker;
+		},
+		isStarted: () => _isStarted,
 		setInterval: (msOrFn: Interval) => {
 			interval = msOrFn;
 			return ticker;
