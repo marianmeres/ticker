@@ -33,6 +33,8 @@ suite.test('tick tick', async () => {
 
 	// cleanup
 	unsub();
+
+	assert(t.getInterval() === 10);
 });
 
 suite.test('tick sleep unsub', async () => {

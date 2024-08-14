@@ -39,6 +39,8 @@ suite.test('delayed ticker', async () => {
 	assert(finished.length === 3);
 
 	assert(finished[1].error);
+
+	assert(t.getInterval() === 10);
 });
 
 suite.test('delayed ticker restart', async () => {

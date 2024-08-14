@@ -7,6 +7,7 @@ interface Ticker {
 	start: () => Ticker;
 	stop: () => Ticker;
 	setInterval: (msOrFn: Interval) => Ticker;
+	getInterval: () => number;
 }
 
 const now = () => (typeof window !== 'undefined' ? window.performance.now() : Date.now());
@@ -105,6 +106,8 @@ export const createTicker = (
 			interval = msOrFn;
 			return ticker;
 		},
+		// readonly initial interval value
+		getInterval: () => _getInterval(0),
 	};
 
 	// start now?
@@ -126,6 +129,7 @@ interface DelayedWorkerTicker {
 	start: () => DelayedWorkerTicker;
 	stop: () => DelayedWorkerTicker;
 	setInterval: (ms: Interval) => DelayedWorkerTicker;
+	getInterval: () => number;
 }
 
 //
@@ -202,6 +206,8 @@ export const createDelayedWorkerTicker = (
 			interval = msOrFn;
 			return ticker;
 		},
+		// readonly initial interval value
+		getInterval: () => _getInterval(0),
 	};
 
 	// start now?

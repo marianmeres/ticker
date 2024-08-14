@@ -4,6 +4,7 @@ interface Ticker {
     start: () => Ticker;
     stop: () => Ticker;
     setInterval: (msOrFn: Interval) => Ticker;
+    getInterval: () => number;
 }
 export declare const createTicker: (interval?: Interval, start?: boolean, logger?: any) => Ticker;
 interface DelayedTickerVal {
@@ -17,6 +18,7 @@ interface DelayedWorkerTicker {
     start: () => DelayedWorkerTicker;
     stop: () => DelayedWorkerTicker;
     setInterval: (ms: Interval) => DelayedWorkerTicker;
+    getInterval: () => number;
 }
 export declare const createDelayedWorkerTicker: (worker: CallableFunction, interval?: Interval, start?: boolean) => DelayedWorkerTicker;
 export {};
