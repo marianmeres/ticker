@@ -3,7 +3,7 @@ import { TestRunner } from '@marianmeres/test-runner';
 import { strict as assert } from 'node:assert';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createTicker } from '../src/index.js';
+import { createTicker, createTickerRAF } from '../src/index.js';
 
 const clog = createClog(path.basename(fileURLToPath(import.meta.url)));
 const suite = new TestRunner(path.basename(fileURLToPath(import.meta.url)));
@@ -57,6 +57,24 @@ suite.test('tick sleep unsub', async () => {
 
 	// cleanup
 	t.stop();
+});
+
+suite.test('raf ticker', async () => {
+	const t = createTickerRAF(1000 / 60);
+	const log: number[] = [];
+
+	const unsub = t.subscribe((v) => log.push(v));
+
+	t.start();
+
+	// 0, and only first
+	await sleep(1000 / 60 + 5);
+	// await sleep(10);
+	t.stop();
+	unsub();
+
+	// 0 (factory), num (start tick), num (second tick), 0 (stop)
+	assert(log.length === 4);
 });
 
 suite.test('tick sleep stop start', async () => {

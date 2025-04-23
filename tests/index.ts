@@ -14,4 +14,6 @@ TestRunner.runAll(__dirname, {
 	verbose,
 	rootDir: __dirname,
 	enableErrorsSummaryOnNonVerbose: true,
-}).then();
+}).then(() => {
+	// process.exit(0);
+});

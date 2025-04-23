@@ -1,4 +1,5 @@
 import { createStore } from '@marianmeres/store';
+import { setTimeoutRAF } from './set-timeout-raf.js';
 
 type Interval = number | ((previous: number, storeVal: any) => number);
 
@@ -22,13 +23,27 @@ const _assertValidInterval = (ms: number) => {
 	return ms;
 };
 
-export const createTicker = (
+/** Internal worker */
+function _createTicker(
 	interval: Interval = 1000,
 	start = false,
-	logger: any = null
-): Ticker => {
+	logger: any = null,
+	useRaf = false
+): Ticker {
 	// for debug
 	const _log = (...v) => (typeof logger === 'function' ? logger.apply(null, v) : null);
+
+	// sanity check
+	if (useRaf && typeof interval === 'number' && interval < 1000 / 60) {
+		console.warn(
+			[
+				'Smaller interval than 60Hz may not be accurate with RAF ticker.',
+				'Consider using `createTicker` instead of `createTickerRAF`.',
+			].join(' ')
+		);
+	}
+	const MIN_TIMEOUT = useRaf ? 1000 / 60 : 0;
+	const _setTimeout = useRaf ? setTimeoutRAF : setTimeout;
 
 	// initialize
 	const _store = createStore<number>(0);
@@ -64,8 +79,11 @@ export const createTicker = (
 		const _offset = _duration ? _duration - _previousInterval : 0;
 
 		// schedule next tick while applying the offset
-		const _nextInterval = Math.max(0, _getInterval(_previousInterval) - _offset);
-		_timerId = setTimeout(_tick, _nextInterval);
+		const _nextInterval = Math.max(
+			MIN_TIMEOUT,
+			_getInterval(_previousInterval) - _offset
+		);
+		_timerId = _setTimeout(_tick, _nextInterval);
 		_previousInterval = _nextInterval;
 
 		//
@@ -90,7 +108,14 @@ export const createTicker = (
 			_isStarted = false;
 			_store.set(0);
 			if (_timerId) {
-				clearTimeout(_timerId);
+				// for RAF
+				if (typeof _timerId === 'function') {
+					_timerId();
+				}
+				// for regular setTimeout
+				else {
+					clearTimeout(_timerId);
+				}
 				_timerId = 0;
 			}
 			_last = 0;
@@ -114,6 +139,24 @@ export const createTicker = (
 	if (start) ticker.start();
 
 	return ticker;
+}
+
+/** Main API */
+export function createTicker(
+	interval: Interval = 1000,
+	start = false,
+	logger: any = null
+): Ticker {
+	return _createTicker(interval, start, logger, false);
+}
+
+/** Main API */
+export const createTickerRAF = (
+	interval: Interval = 1000,
+	start = false,
+	logger: any = null
+): Ticker => {
+	return _createTicker(interval, start, logger, true);
 };
 
 //
@@ -132,7 +175,7 @@ interface DelayedWorkerTicker {
 	getInterval: () => number;
 }
 
-//
+/** Main API */
 export const createDelayedWorkerTicker = (
 	worker: CallableFunction,
 	interval: Interval = 1000,

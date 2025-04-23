@@ -6,7 +6,8 @@ interface Ticker {
     setInterval: (msOrFn: Interval) => Ticker;
     getInterval: () => number;
 }
-export declare const createTicker: (interval?: Interval, start?: boolean, logger?: any) => Ticker;
+export declare function createTicker(interval?: Interval, start?: boolean, logger?: any): Ticker;
+export declare const createTickerRAF: (interval?: Interval, start?: boolean, logger?: any) => Ticker;
 interface DelayedTickerVal {
     started: number;
     finished: number;
