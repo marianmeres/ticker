@@ -1,24 +1,17 @@
-import { createClog } from '@marianmeres/clog';
-import { TestRunner } from '@marianmeres/test-runner';
-import { strict as assert } from 'node:assert';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createDelayedWorkerTicker } from '../src/index.js';
+import { assert, assertEquals } from "@std/assert";
+import { createDelayedWorkerTicker } from "../src/create-ticker.ts";
 
-const clog = createClog(path.basename(fileURLToPath(import.meta.url)));
-const suite = new TestRunner(path.basename(fileURLToPath(import.meta.url)));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-suite.test('delayed ticker', async () => {
+Deno.test("delayed ticker", async () => {
 	let i = 0;
 	const t = createDelayedWorkerTicker(
-		async (previousVal) => {
-			if (++i === 2) throw new Error('Boo');
+		(_previousVal: unknown) => {
+			if (++i === 2) throw new Error("Boo");
 			return i;
 		},
 		10,
-		false
+		false,
 	);
 	const log: any[] = [];
 
@@ -35,20 +28,20 @@ suite.test('delayed ticker', async () => {
 	// console.log(log);
 	// console.log('finished', finished);
 
-	assert(log.length === 7);
-	assert(finished.length === 3);
+	assertEquals(log.length, 7);
+	assertEquals(finished.length, 3);
 
 	assert(finished[1].error);
 
-	assert(t.getInterval() === 10);
+	assertEquals(t.getInterval(), 10);
 });
 
-suite.test('delayed ticker restart', async () => {
+Deno.test("delayed ticker restart", async () => {
 	let i = 0;
 	const t = createDelayedWorkerTicker(
-		async (previousVal) => ++i,
+		(_previousVal: unknown) => ++i,
 		() => 10,
-		false
+		false,
 	);
 	const log: any[] = [];
 
@@ -72,12 +65,10 @@ suite.test('delayed ticker restart', async () => {
 	// console.log(log);
 	// console.log('finished', finished);
 
-	assert(log.length === 9);
-	assert(finished.length === 4);
+	assertEquals(log.length, 9);
+	assertEquals(finished.length, 4);
 
 	// clog(finished.filter((v) => v.result === 1));
-	assert(finished.filter((v) => v.result === 1).length == 2);
-	assert(finished.filter((v) => v.result === 2).length == 2);
+	assertEquals(finished.filter((v) => v.result === 1).length, 2);
+	assertEquals(finished.filter((v) => v.result === 2).length, 2);
 });
-
-export default suite;
