@@ -1,6 +1,6 @@
 {
 	"name": "@marianmeres/ticker",
-	"version": "1.16.0",
+	"version": "1.16.1",
 	"exports": "./src/mod.ts",
 	"tasks": {
 		"test": "deno test --watch",
