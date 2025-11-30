@@ -368,3 +368,10 @@ Returns RAF functions (native in browser, polyfill elsewhere).
 #### `setTimeoutRAF(cb, delay): () => void`
 
 A `setTimeout`-like function using `requestAnimationFrame`. Returns a cancel function.
+
+## Package Identity
+
+- **Name:** @marianmeres/ticker
+- **Author:** Marian Meres
+- **Repository:** https://github.com/marianmeres/ticker
+- **License:** MIT
