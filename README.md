@@ -1,5 +1,8 @@
 # @marianmeres/ticker
 
+[![NPM version](https://img.shields.io/npm/v/@marianmeres/ticker)](https://www.npmjs.com/package/@marianmeres/ticker)
+[![JSR version](https://jsr.io/badges/@marianmeres/ticker)](https://jsr.io/@marianmeres/ticker)
+
 Do something when it ticks. With a
 [store-compatible](https://github.com/marianmeres/store) API.
 
