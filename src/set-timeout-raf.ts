@@ -25,9 +25,14 @@ export function setTimeoutRAF(
 	delay: number,
 ): () => void {
 	const { requestAnimationFrame, cancelAnimationFrame } = getRaf();
-	const start = Date.now();
+	let start: number | null = null;
 
 	function on_frame(timestamp: number): void {
+		// Capture the first RAF timestamp as baseline (not Date.now())
+		// This ensures compatibility with browser's DOMHighResTimeStamp
+		if (start === null) {
+			start = timestamp;
+		}
 		const elapsed = timestamp - start;
 		if (elapsed >= delay) {
 			cb();
