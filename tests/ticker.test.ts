@@ -90,7 +90,11 @@ Deno.test(
 		// Should have: 0 (factory), start tick, multiple subsequent ticks, 0 (stop)
 		// With 100ms wait and 20ms interval, expect at least 5 ticks (100/20) plus initial 0 and final 0
 		// Being conservative: at least 4 total entries (0, tick, tick, 0)
-		assertEquals(log.length >= 4, true, `Expected at least 4 ticks, got ${log.length}: ${JSON.stringify(log)}`);
+		assertEquals(
+			log.length >= 4,
+			true,
+			`Expected at least 4 ticks, got ${log.length}: ${JSON.stringify(log)}`,
+		);
 
 		// Verify first is 0 (initial), last is 0 (stop), and middle values are timestamps
 		assertEquals(log[0], 0, "First value should be 0 (initial state)");
@@ -98,7 +102,11 @@ Deno.test(
 
 		// All middle values should be positive timestamps
 		for (let i = 1; i < log.length - 1; i++) {
-			assertEquals(log[i] > 0, true, `Tick ${i} should be a positive timestamp, got ${log[i]}`);
+			assertEquals(
+				log[i] > 0,
+				true,
+				`Tick ${i} should be a positive timestamp, got ${log[i]}`,
+			);
 		}
 	},
 );

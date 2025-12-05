@@ -71,7 +71,7 @@ const _assertValidInterval = (ms: number): number => {
 	ms = parseInt(ms as any, 10);
 	if (Number.isNaN(ms) || ms <= 0) {
 		throw new TypeError(
-			`Invalid interval. Expecting positive non-zero number of milliseconds.`
+			`Invalid interval. Expecting positive non-zero number of milliseconds.`,
 		);
 	}
 	return ms;
@@ -83,7 +83,7 @@ function _createTicker(
 	start = false,
 	logger: ((...args: unknown[]) => void) | null = null,
 	useRaf = false,
-	onError: ErrorHandler | null = null
+	onError: ErrorHandler | null = null,
 ): Ticker {
 	// for debug
 	const _log = (...v: unknown[]) =>
@@ -95,7 +95,7 @@ function _createTicker(
 			[
 				"Smaller interval than 60Hz may not be accurate with RAF ticker.",
 				"Consider using `createTicker` instead of `createTickerRAF`.",
-			].join(" ")
+			].join(" "),
 		);
 	}
 	const MIN_TIMEOUT = useRaf ? 1000 / 60 : 0;
@@ -107,9 +107,7 @@ function _createTicker(
 
 	const _getInterval = (previous: number) =>
 		_assertValidInterval(
-			typeof interval === "function"
-				? interval(previous, _store.get())
-				: interval
+			typeof interval === "function" ? interval(previous, _store.get()) : interval,
 		);
 
 	// track the adjusted interval
@@ -140,7 +138,7 @@ function _createTicker(
 		// schedule next tick while applying the offset
 		const _nextInterval = Math.max(
 			MIN_TIMEOUT,
-			_getInterval(_previousInterval) - _offset
+			_getInterval(_previousInterval) - _offset,
 		);
 		_timerId = _setTimeout(_tick, _nextInterval);
 		_previousInterval = _nextInterval;
@@ -227,7 +225,7 @@ function _createTicker(
 export function createTicker(
 	interval: Interval = 1000,
 	startOrOptions: boolean | TickerOptions = false,
-	logger: ((...args: unknown[]) => void) | null = null
+	logger: ((...args: unknown[]) => void) | null = null,
 ): Ticker {
 	// Support both legacy (boolean, logger) and new (options object) signatures
 	if (typeof startOrOptions === "object" && startOrOptions !== null) {
@@ -237,7 +235,7 @@ export function createTicker(
 			opts.start ?? false,
 			opts.logger ?? null,
 			false,
-			opts.onError ?? null
+			opts.onError ?? null,
 		);
 	}
 	return _createTicker(
@@ -245,7 +243,7 @@ export function createTicker(
 		startOrOptions as boolean,
 		logger,
 		false,
-		null
+		null,
 	);
 }
 
@@ -278,7 +276,7 @@ export function createTicker(
 export const createTickerRAF = (
 	interval: Interval = 1000,
 	startOrOptions: boolean | TickerOptions = false,
-	logger: ((...args: unknown[]) => void) | null = null
+	logger: ((...args: unknown[]) => void) | null = null,
 ): Ticker => {
 	// Support both legacy (boolean, logger) and new (options object) signatures
 	if (typeof startOrOptions === "object" && startOrOptions !== null) {
@@ -288,7 +286,7 @@ export const createTickerRAF = (
 			opts.start ?? false,
 			opts.logger ?? null,
 			true,
-			opts.onError ?? null
+			opts.onError ?? null,
 		);
 	}
 	return _createTicker(interval, startOrOptions as boolean, logger, true, null);
@@ -402,17 +400,15 @@ export interface DelayedWorkerTicker {
 export const createDelayedWorkerTicker = (
 	worker: (previous: DelayedTickerVal) => Promise<unknown> | unknown,
 	interval: Interval = 1000,
-	startOrOptions: boolean | DelayedWorkerTickerOptions = false
+	startOrOptions: boolean | DelayedWorkerTickerOptions = false,
 ): DelayedWorkerTicker => {
 	// Support both legacy (boolean) and new (options object) signatures
-	const start =
-		typeof startOrOptions === "object" && startOrOptions !== null
-			? startOrOptions.start ?? false
-			: (startOrOptions as boolean);
-	const onError =
-		typeof startOrOptions === "object" && startOrOptions !== null
-			? startOrOptions.onError ?? null
-			: null;
+	const start = typeof startOrOptions === "object" && startOrOptions !== null
+		? startOrOptions.start ?? false
+		: (startOrOptions as boolean);
+	const onError = typeof startOrOptions === "object" && startOrOptions !== null
+		? startOrOptions.onError ?? null
+		: null;
 
 	const _createVal = (o: Partial<DelayedTickerVal> = {}): DelayedTickerVal => ({
 		started: 0,
@@ -425,14 +421,12 @@ export const createDelayedWorkerTicker = (
 	// initialize - pass onError to underlying store if provided
 	const _store = createStore<DelayedTickerVal>(
 		_createVal(),
-		onError ? { onError } : undefined
+		onError ? { onError } : undefined,
 	);
 
 	const _getInterval = (previous: number) =>
 		_assertValidInterval(
-			typeof interval === "function"
-				? interval(previous, _store.get())
-				: interval
+			typeof interval === "function" ? interval(previous, _store.get()) : interval,
 		);
 
 	let _timerId: any = 0;
@@ -449,7 +443,7 @@ export const createDelayedWorkerTicker = (
 			// update only if has not been stopped in the meantime...
 			_isStarted &&
 				_store.set(
-					_createVal({ started, finished: Date.now(), error: null, result })
+					_createVal({ started, finished: Date.now(), error: null, result }),
 				);
 		} catch (error) {
 			_isStarted &&
